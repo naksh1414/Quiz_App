@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  nextjs:
+    build:
+      context: .
+      target: runner
+    container_name: nextjs_app
+    restart: always
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - nextjs
+    networks:
+      - app_network
+    restart: always
+
+networks:
+  app_network:
+    driver: bridge
